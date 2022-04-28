@@ -24,7 +24,8 @@
 
 import setuptools                          # needed to create wheel file
 from distutils.core import setup
-from evtk.version import PYEVTK_VERSION
+# from evtk.version import PYEVTK_VERSION
+PYEVTK_VERSION = 2.0.1
 
 def readme(fname):
     with open(fname, 'r') as f:
