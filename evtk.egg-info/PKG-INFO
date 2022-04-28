@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: evtk
-Version: 2.0.0
+Version: 2.0.1
 Summary: Exports data as binary VTK files
 Home-page: https://github.com/paulo-herrera/PyEVTK.git
 Author: Paulo Herrera

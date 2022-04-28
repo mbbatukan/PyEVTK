@@ -584,7 +584,7 @@ def polyLinesToVTK(path, x, y, z, pointsPerLine, cellData = None, pointData = No
     return w.getFileName()
 
 # ==============================================================================
-def unstructuredGridToVTK(path, x, y, z, connectivity, offsets, cell_types, cellData = None, pointData = None, comments = None ):
+def unstructuredGridToVTK(path, xyz, connectivity, offsets, cell_types, cellData = None, pointData = None, comments = None ):
     """
         Export unstructured grid and associated data.
 
@@ -612,17 +612,17 @@ def unstructuredGridToVTK(path, x, y, z, connectivity, offsets, cell_types, cell
             Full path to saved file.
 
     """
-    assert (x.size == y.size == z.size)
-    x = __convertListToArray(x)
-    y = __convertListToArray(y)
-    z = __convertListToArray(z)
-    connectivity = __convertListToArray(connectivity)
-    offsets = __convertListToArray(offsets)
-    cell_types = __convertListToArray(cell_types)
-    cellData = __convertDictListToArrays(cellData)
-    pointData = __convertDictListToArrays(pointData)
+    # assert (x.size == y.size == z.size)
+    # x = __convertListToArray(x)
+    # y = __convertListToArray(y)
+    # z = __convertListToArray(z)
+    # connectivity = __convertListToArray(connectivity)
+    # offsets = __convertListToArray(offsets)
+    # cell_types = __convertListToArray(cell_types)
+    # cellData = __convertDictListToArrays(cellData)
+    # pointData = __convertDictListToArrays(pointData)
     
-    npoints = x.size
+    npoints = xyz.size
     ncells = cell_types.size
     assert (offsets.size == ncells)
     
@@ -632,7 +632,7 @@ def unstructuredGridToVTK(path, x, y, z, connectivity, offsets, cell_types, cell
     w.openPiece(ncells = ncells, npoints = npoints)
     
     w.openElement("Points")
-    w.addData("points", (x,y,z))
+    w.addData("points", xyz)
     w.closeElement("Points")
     w.openElement("Cells")
     w.addData("connectivity", connectivity)
@@ -644,7 +644,7 @@ def unstructuredGridToVTK(path, x, y, z, connectivity, offsets, cell_types, cell
 
     w.closePiece()
     w.closeGrid()
-    w.appendData( (x,y,z) )
+    w.appendData(xyz)
     w.appendData(connectivity).appendData(offsets).appendData(cell_types)
 
     _appendDataToFile(w, cellData = cellData, pointData = pointData)

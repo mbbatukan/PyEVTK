@@ -388,13 +388,15 @@ class VtkFile:
                       arrays must represent the components of a vector field.
                       All arrays must be one dimensional or three-dimensional.
         """
-        if type(data).__name__ == "tuple": # vector data
-            assert (len(data) == 3)
-            x = data[0]
-            self.addHeader(name, x.dtype.name, x.size, 3)
-        elif type(data).__name__ == "ndarray":
+        # if type(data).__name__ == "tuple": # vector data
+        #     assert (len(data) == 3)
+        #     x = data[0]
+        #     self.addHeader(name, x.dtype.name, x.size, 3)
+        if type(data).__name__ == "ndarray":
             if data.ndim == 1 or data.ndim == 3:
                 self.addHeader(name, data.dtype.name, data.size, 1)
+            elif data.ndim == 2:
+                self.addHeader(name, data.dtype.name, data.size, data.shape[1])
             else:
                 assert False, "Bad array shape: " + str(data.shape)
         else:
@@ -435,20 +437,20 @@ class VtkFile:
         """
         self.openAppendedData()
 
-        if type(data).__name__ == 'tuple': # 3 numpy arrays
-            ncomp = len(data)
-            assert (ncomp == 3)
-            dsize = data[0].dtype.itemsize
-            nelem = data[0].size
-            block_size = ncomp * nelem * dsize
-            #if self.largeFile == False:
-            writeBlockSize(self.xml.stream, block_size)
-            #else:
-            #    writeBlockSize64Bit(self.xml.stream, block_size)
-            x, y, z = data[0], data[1], data[2]
-            writeArraysToFile(self.xml.stream, x, y, z)
+        # if type(data).__name__ == 'tuple': # 3 numpy arrays
+        #     ncomp = len(data)
+        #     assert (ncomp == 3)
+        #     dsize = data[0].dtype.itemsize
+        #     nelem = data[0].size
+        #     block_size = ncomp * nelem * dsize
+        #     #if self.largeFile == False:
+        #     writeBlockSize(self.xml.stream, block_size)
+        #     #else:
+        #     #    writeBlockSize64Bit(self.xml.stream, block_size)
+        #     x, y, z = data[0], data[1], data[2]
+        #     writeArraysToFile(self.xml.stream, x, y, z)
             
-        elif type(data).__name__ == 'ndarray' and (data.ndim == 1 or data.ndim == 3): # single numpy array
+        if type(data).__name__ == 'ndarray' and (data.ndim == 1 or data.ndim == 3): # single numpy array
             ncomp = 1 
             dsize = data.dtype.itemsize
             nelem = data.size
@@ -458,7 +460,18 @@ class VtkFile:
             #else:
             #    writeBlockSize64Bit(self.xml.stream, block_size)
             writeArrayToFile(self.xml.stream, data)
-         
+
+        elif type(data).__name__ == 'ndarray' and data.ndim == 2: # 2d numpy array
+            ncomp = data.shape[1]
+            dsize = data.dtype.itemsize
+            nelem = data.shape[0]
+            block_size = ncomp * nelem * dsize
+            #if self.largeFile == False:
+            writeBlockSize(self.xml.stream, block_size)
+            #else:
+            #    writeBlockSize64Bit(self.xml.stream, block_size)
+            writeArraysToFile(self.xml.stream, data)
+
         else:
             assert False
 
