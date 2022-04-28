@@ -71,33 +71,80 @@ def writeArrayToFile(stream, data):
     stream.write(bin)
     
 # ==============================================================================
-def writeArraysToFile(stream, x, y, z):
+def writeArraysToFile(stream, array_2D):
     # Check if arrays have same shape and data type
-    assert ( x.size == y.size == z.size ), "Different array sizes."
-    assert ( x.dtype.itemsize == y.dtype.itemsize == z.dtype.itemsize ), "Different item sizes."
-  
-    nitems = x.size
-    itemsize = x.dtype.itemsize
+    if array_2D.shape[1] == 3:
+        x, y, z = array_2D[:,0], array_2D[:,1], array_2D[:,2]
 
-    fmt = _get_byte_order_char() + str(1) + np_to_struct[x.dtype.name]  # > for big endian
+        assert ( x.size == y.size == z.size ), "Different array sizes."
+        assert ( x.dtype.itemsize == y.dtype.itemsize == z.dtype.itemsize ), "Different item sizes."
     
-    # Check if arrays are contiguous
-    assert (x.flags['C_CONTIGUOUS'] or x.flags['F_CONTIGUOUS'])
-    assert (y.flags['C_CONTIGUOUS'] or y.flags['F_CONTIGUOUS'])
-    assert (z.flags['C_CONTIGUOUS'] or z.flags['F_CONTIGUOUS'])
-    
-    
-    # NOTE: VTK expects data in FORTRAN order
-    # This is only needed when a multidimensional array has C-layout
-    xx = np.ravel(x, order='F')
-    yy = np.ravel(y, order='F')
-    zz = np.ravel(z, order='F')    
+        nitems = x.size
+        # itemsize = x.dtype.itemsize
+
+        fmt = _get_byte_order_char() + str(1) + np_to_struct[x.dtype.name]  # > for big endian
         
-    # eliminate this loop by creating a composed array.
-    for i in range(nitems):
-        bx = struct.pack(fmt, xx[i])
-        by = struct.pack(fmt, yy[i])
-        bz = struct.pack(fmt, zz[i])
-        stream.write(bx)
-        stream.write(by)
-        stream.write(bz)
+        # Check if arrays are contiguous
+        assert (x.flags['C_CONTIGUOUS'] or x.flags['F_CONTIGUOUS'])
+        assert (y.flags['C_CONTIGUOUS'] or y.flags['F_CONTIGUOUS'])
+        assert (z.flags['C_CONTIGUOUS'] or z.flags['F_CONTIGUOUS'])
+        
+        
+        # NOTE: VTK expects data in FORTRAN order
+        # This is only needed when a multidimensional array has C-layout
+        xx = np.ravel(x, order='F')
+        yy = np.ravel(y, order='F')
+        zz = np.ravel(z, order='F')    
+            
+        # eliminate this loop by creating a composed array.
+        for i in range(nitems):
+            bx = struct.pack(fmt, xx[i])
+            by = struct.pack(fmt, yy[i])
+            bz = struct.pack(fmt, zz[i])
+            stream.write(bx)
+            stream.write(by)
+            stream.write(bz)
+
+    elif array_2D.shape[1] == 6:
+        x, y, z, k, l, m = array_2D[:,0], array_2D[:,1], array_2D[:,2], array_2D[:,3], array_2D[:,4], array_2D[:,5]
+        
+        assert ( x.size == y.size == z.size == k.size == l.size == m.size ), "Different array sizes."
+        assert ( x.dtype.itemsize == y.dtype.itemsize == z.dtype.itemsize == k.dtype.itemsize == l.dtype.itemsize == m.dtype.itemsize), "Different item sizes."
+    
+        nitems = x.size
+        # itemsize = x.dtype.itemsize
+
+        fmt = _get_byte_order_char() + str(1) + np_to_struct[x.dtype.name]  # > for big endian
+        
+        # Check if arrays are contiguous
+        assert (x.flags['C_CONTIGUOUS'] or x.flags['F_CONTIGUOUS'])
+        assert (y.flags['C_CONTIGUOUS'] or y.flags['F_CONTIGUOUS'])
+        assert (z.flags['C_CONTIGUOUS'] or z.flags['F_CONTIGUOUS'])
+        assert (k.flags['C_CONTIGUOUS'] or k.flags['F_CONTIGUOUS'])
+        assert (l.flags['C_CONTIGUOUS'] or l.flags['F_CONTIGUOUS'])
+        assert (m.flags['C_CONTIGUOUS'] or m.flags['F_CONTIGUOUS'])
+        
+        
+        # NOTE: VTK expects data in FORTRAN order
+        # This is only needed when a multidimensional array has C-layout
+        xx = np.ravel(x, order='F')
+        yy = np.ravel(y, order='F')
+        zz = np.ravel(z, order='F')    
+        kk = np.ravel(k, order='F')    
+        ll = np.ravel(l, order='F')    
+        mm = np.ravel(m, order='F')    
+            
+        # eliminate this loop by creating a composed array.
+        for i in range(nitems):
+            bx = struct.pack(fmt, xx[i])
+            by = struct.pack(fmt, yy[i])
+            bz = struct.pack(fmt, zz[i])
+            bk = struct.pack(fmt, kk[i])
+            bl = struct.pack(fmt, ll[i])
+            bm = struct.pack(fmt, mm[i])
+            stream.write(bx)
+            stream.write(by)
+            stream.write(bz)        
+            stream.write(bk)        
+            stream.write(bl)        
+            stream.write(bm)        
